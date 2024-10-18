@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+langchain
+langchain_chroma
+langchain_openai
+langchain-community
+pandas
+openpyxl
+transformers
+sentence-transformers 
+faiss-cpu
+
