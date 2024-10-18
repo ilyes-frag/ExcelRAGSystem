@@ -6,6 +6,7 @@ from langchain_openai import ChatOpenAI
 import os
 import pandas as pd
 from dotenv import load_dotenv
+from backend.config import settings
 import faiss
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
@@ -14,11 +15,10 @@ from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from fastapi import HTTPException
 
+load_dotenv()
 
-
-# Set OpenAI API key
-os.environ["OPENAI_API_KEY"] = "sk-8tyGI_x9CqUw_YyT8MRKXocRXX0nixlm6YtwOT9JzdT3BlbkFJ8cYJHuSIdfWYyZwjdo8O7-iV_MBwORz4ctUHfd5RwA"
-
+#os.environ["OPENAI_API_KEY"] = "sk-8tyGI_x9CqUw_YyT8MRKXocRXX0nixlm6YtwOT9JzdT3BlbkFJ8cYJHuSIdfWYyZwjdo8O7-iV_MBwORz4ctUHfd5RwA"
+#os.environ.get("OPENAI_API_KEY")
 llm = ChatOpenAI(model="gpt-3.5-turbo")
 
 vector_store = None
