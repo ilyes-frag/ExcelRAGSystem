@@ -20,16 +20,6 @@ app.add_middleware(
 
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Serve the index.html for any unknown routes (acts like a fallback for React Router)
-
-@app.get("/")
-async def serve_frontend():
-    return FileResponse("static/index.html")
-class QueryRequest(BaseModel):
-    query: str
-
 ## Define request body model
 class QueryRequest(BaseModel):
     query: str
