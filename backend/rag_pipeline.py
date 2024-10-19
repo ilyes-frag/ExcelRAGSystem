@@ -15,8 +15,17 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from fastapi import HTTPException
+from dotenv import load_dotenv
 
 
+
+load_dotenv()
+
+# Now access the API key
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
+# Set the API key for use with OpenAI
+os.environ["OPENAI_API_KEY"] = openai_api_key
 
 llm = ChatOpenAI(model="gpt-3.5-turbo")
 
