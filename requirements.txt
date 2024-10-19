@@ -126,7 +126,7 @@ tenacity==8.5.0
 threadpoolctl==3.5.0
 tiktoken==0.8.0
 tokenizers==0.20.1
-torch==2.5.0
+torch-cpu
 tqdm==4.66.5
 transformers==4.45.2
 typer==0.12.5
