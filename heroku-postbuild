@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Navigate to the frontend directory
+cd frontend
+
+# Install frontend dependencies
+npm install
+
+# Build the frontend (this will generate the static files in 'build/')
+npm run build
+
+# Move back to the root and move the 'build' folder to the backend static folder
+cd ..
+mkdir -p backend/static
+cp -r frontend/build/* backend/static/
