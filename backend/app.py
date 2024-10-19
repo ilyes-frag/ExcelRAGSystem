@@ -2,6 +2,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from backend.rag_pipeline import query_rag_system,initialize_rag_pipeline_once
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 
 
 
@@ -17,6 +20,13 @@ app.add_middleware(
 
 
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Serve the index.html for any unknown routes (acts like a fallback for React Router)
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse("static/index.html")
 class QueryRequest(BaseModel):
     query: str
 
