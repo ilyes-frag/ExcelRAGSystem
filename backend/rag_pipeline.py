@@ -25,27 +25,23 @@ rag_chain = None
 
 def load_and_process_data():
     try:
-        # Load Excel files
         file_path_1 = 'backend/data/Christmas Research Results.xlsx'
         file_path_2 = 'backend/data/Sustainability Research Results.xlsx'
         df1 = pd.read_excel(file_path_1)
         df2 = pd.read_excel(file_path_2)
 
-        # Add dataset labels for comparison purposes
         df1["source"] = "Christmas"
         df2["source"] = "Sustainability"
         
         combined_data = pd.concat([df1, df2])
 
-        # Save the combined data as CSV
         combined_csv_path = 'combined_data.csv'
         combined_data.to_csv(combined_csv_path, index=False)
 
-        # Process the data using CSVLoader
         loader = CSVLoader(file_path=combined_csv_path)
         docs = loader.load_and_split()
 
-        # Tag documents with their dataset source for comparison purposes
+        # tag documents with their dataset source for comparison purposes
         for doc in docs:
             if "Christmas" in doc.page_content:
                 doc.metadata["source"] = "Christmas"
@@ -56,13 +52,12 @@ def load_and_process_data():
     except Exception as e:
         raise Exception(f"Error loading Excel files: {str(e)}")
 
-# Initialize RAG pipeline (called once during server startup)
 def initialize_rag_pipeline_once():
     global vector_store, rag_chain
     try:
         documents = load_and_process_data()
 
-        # Initialize FAISS vector store and OpenAI embeddings
+        # Initiialize FAISS vector store and OpenAI embeddings
         embeddings = OpenAIEmbeddings()
         index = faiss.IndexFlatL2(len(embeddings.embed_query(" ")))  # Initialize FAISS index
         vector_store = FAISS(
@@ -78,7 +73,6 @@ def initialize_rag_pipeline_once():
         # Create the retriever
         retriever = vector_store.as_retriever()
 
-        # Set up the system prompt for comparison
         system_prompt = (
             "You are an assistant for analyzing and comparing survey data from two different datasets. "
             "You have information from Christmas and Sustainability surveys. "
@@ -89,7 +83,7 @@ def initialize_rag_pipeline_once():
             "{context}"
         )
 
-        # Create the prompt template for the chain
+        #gCreate the prompt template for the chain
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
             ("human", "{input}"),
@@ -106,7 +100,6 @@ def initialize_rag_pipeline_once():
 # Query the RAG system (this is called for each query)
 def query_rag_system(query: str):
     try:
-        # Ensure the RAG pipeline is initialized before querying
         if not rag_chain:
             raise Exception("RAG pipeline is not initialized.")
         
