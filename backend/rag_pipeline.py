@@ -1,12 +1,13 @@
+
+#os.environ["OPENAI_API_KEY"] = "sk-8tyGI_x9CqUw_YyT8MRKXocRXX0nixlm6YtwOT9JzdT3BlbkFJ8cYJHuSIdfWYyZwjdo8O7-iV_MBwORz4ctUHfd5RwA"
+#os.environ.get("OPENAI_API_KEY")
+
 # rag_pipeline.py
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OpenAIEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import ChatOpenAI
 import os
 import pandas as pd
-from dotenv import load_dotenv
-from backend.config import settings
 import faiss
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
@@ -15,10 +16,8 @@ from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from fastapi import HTTPException
 
-load_dotenv()
 
-#os.environ["OPENAI_API_KEY"] = "sk-8tyGI_x9CqUw_YyT8MRKXocRXX0nixlm6YtwOT9JzdT3BlbkFJ8cYJHuSIdfWYyZwjdo8O7-iV_MBwORz4ctUHfd5RwA"
-#os.environ.get("OPENAI_API_KEY")
+
 llm = ChatOpenAI(model="gpt-3.5-turbo")
 
 vector_store = None
@@ -26,12 +25,19 @@ rag_chain = None
 
 def load_and_process_data():
     try:
+        # Load Excel files
         file_path_1 = 'backend/data/Christmas Research Results.xlsx'
         file_path_2 = 'backend/data/Sustainability Research Results.xlsx'
         df1 = pd.read_excel(file_path_1)
         df2 = pd.read_excel(file_path_2)
+
+        # Add dataset labels for comparison purposes
+        df1["source"] = "Christmas"
+        df2["source"] = "Sustainability"
+        
         combined_data = pd.concat([df1, df2])
 
+        # Save the combined data as CSV
         combined_csv_path = 'combined_data.csv'
         combined_data.to_csv(combined_csv_path, index=False)
 
@@ -39,11 +45,18 @@ def load_and_process_data():
         loader = CSVLoader(file_path=combined_csv_path)
         docs = loader.load_and_split()
 
+        # Tag documents with their dataset source for comparison purposes
+        for doc in docs:
+            if "Christmas" in doc.page_content:
+                doc.metadata["source"] = "Christmas"
+            elif "Sustainability" in doc.page_content:
+                doc.metadata["source"] = "Sustainability"
+
         return docs
     except Exception as e:
         raise Exception(f"Error loading Excel files: {str(e)}")
 
-# Initialize RAG pipeline once (this is called only once during server startup)
+# Initialize RAG pipeline (called once during server startup)
 def initialize_rag_pipeline_once():
     global vector_store, rag_chain
     try:
@@ -56,7 +69,7 @@ def initialize_rag_pipeline_once():
             embedding_function=embeddings,
             index=index,
             docstore=InMemoryDocstore(),
-            index_to_docstore_id={}
+            index_to_docstore_id={},
         )
 
         # Add the split CSV data to the vector store
@@ -65,13 +78,13 @@ def initialize_rag_pipeline_once():
         # Create the retriever
         retriever = vector_store.as_retriever()
 
-        # Set up the system prompt
+        # Set up the system prompt for comparison
         system_prompt = (
-            "You are an assistant for question-answering tasks. "
-            "Use the following pieces of retrieved context to answer "
-            "the question. If you don't know the answer, say that you "
-            "don't know. Use three sentences maximum and keep the "
-            "answer concise."
+            "You are an assistant for analyzing and comparing survey data from two different datasets. "
+            "You have information from Christmas and Sustainability surveys. "
+            "Use the following retrieved context from both datasets to answer the question. "
+            "Highlight key similarities and differences if applicable. "
+            "If the answer cannot be found in both datasets, provide insights from one of them. "
             "\n\n"
             "{context}"
         )
