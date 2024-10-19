@@ -5,7 +5,9 @@ langchain_chroma
 langchain_openai
 langchain-community
 pandas
+openai
 openpyxl
+python-dotenv
 transformers
 sentence-transformers 
 faiss-cpu

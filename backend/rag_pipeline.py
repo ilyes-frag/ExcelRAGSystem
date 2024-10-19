@@ -1,8 +1,4 @@
 
-#os.environ["OPENAI_API_KEY"] = "sk-8tyGI_x9CqUw_YyT8MRKXocRXX0nixlm6YtwOT9JzdT3BlbkFJ8cYJHuSIdfWYyZwjdo8O7-iV_MBwORz4ctUHfd5RwA"
-#os.environ.get("OPENAI_API_KEY")
-
-# rag_pipeline.py
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
@@ -21,10 +17,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Now access the API key
 openai_api_key = os.getenv("OPENAI_API_KEY")
-
-# Set the API key for use with OpenAI
 os.environ["OPENAI_API_KEY"] = openai_api_key
 
 llm = ChatOpenAI(model="gpt-3.5-turbo")
